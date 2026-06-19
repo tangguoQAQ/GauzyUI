@@ -1,0 +1,15 @@
+﻿CompileFlags:
+  CompilationDatabase: build/
+
+Diagnostics:
+  ClangTidy:
+    Add: [performance*, modernize*, readability*, bugprone*, cppcoreguidelines-*]
+    Remove: 
+      - modernize-use-trailing-return-type
+      - modernize-avoid-c-arrays
+      - readability-identifier-length
+      - cppcoreguidelines-avoid-c-arrays
+      - cppcoreguidelines-pro-bounds-array-to-pointer-decay
+      
+Documentation:
+  CommentFormat: Doxygen
