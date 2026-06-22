@@ -2,33 +2,34 @@
 
 #include <string>
 
-#include <Windows.h>
+#include "type/BasicTypes.hpp"
+#include "type/WindowHandle.hpp"
+#include "graphic/Renderer.hpp"
 
-#include "type/Vec2d.hpp"
-
-namespace gauzy::comp
+namespace gauzy
 {
-    struct WindowHandle
-    {
-        HWND value;
-
-        WindowHandle();
-        WindowHandle(HWND handle);
-
-        operator HWND() const;
-    };
-
+    /**
+     * @brief 薄云窗口类。窗口类名为 `GauzyWindowClass` 。
+     */
     class Window
     {
     public:
-        Window(const std::string& title, gauzy::type::Vec2d size);
+        Window(const std::string& title, const gauzy::type::SizeU& size);
         
         void show() const;
 
-        [[nodiscard]] WindowHandle getWindowHandle() const;
+        void release();
+
+        [[nodiscard]] type::WindowHandle getWindowHandle() const;
+
+        /**
+         * @brief 获取窗口所管理的渲染器。注意返回值为引用，见 `graphic::Renderer` 。
+         */
+        [[nodiscard]] graphic::Renderer& getRenderer();
 
     private:
-        WindowHandle handle;
+        type::WindowHandle handle;
 
+        graphic::Renderer renderer;
     };
-} // namespace gauzy::comp
+} // namespace gauzy
