@@ -2,9 +2,12 @@
 
 #include <string>
 
+#include <Windows.h>
+
 #include "type/BasicTypes.hpp"
 #include "type/WindowHandle.hpp"
 #include "graphic/Renderer.hpp"
+#include "comp/CompGroup.hpp"
 
 namespace gauzy
 {
@@ -16,20 +19,33 @@ namespace gauzy
     public:
         Window(const std::string& title, const gauzy::type::SizeU& size);
         
+        /**
+         * @brief 显示窗口并进入消息循环，此函数会将阻塞直到窗口关闭。
+         */
         void show() const;
 
-        void release();
+        /**
+         * @brief 重画窗口客户区。
+         */
+        void paint();
 
-        [[nodiscard]] type::WindowHandle getWindowHandle() const;
+        [[nodiscard]] const type::WindowHandle& getWindowHandle() const noexcept;
 
         /**
-         * @brief 获取窗口所管理的渲染器。注意返回值为引用，见 `graphic::Renderer` 。
-         */
-        [[nodiscard]] graphic::Renderer& getRenderer();
+        * @brief 获取窗口的顶级组件群。
+        */
+        [[nodiscard]] comp::CompGroup& getTopGroup() noexcept;
 
     private:
         type::WindowHandle handle;
 
         graphic::Renderer renderer;
+
+        comp::CompGroup topGroup;
+
+        static LRESULT GauzyWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+            UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+
+        void release();
     };
 } // namespace gauzy

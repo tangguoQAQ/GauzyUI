@@ -10,10 +10,6 @@
 
 namespace gauzy
 {
-
-    LRESULT CALLBACK GauzyWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-
     constexpr wchar_t CLASS_NAME[] = L"GauzyWindowClass";
     
     static void registerWindowClass(HINSTANCE hInstance)
@@ -54,9 +50,6 @@ namespace gauzy
             throw std::runtime_error("Failed to create window");
         }
 
-        SetWindowSubclass(result, GauzyWindowProc,
-            0, reinterpret_cast<LONG_PTR>(thisPtr));
-
         return type::WindowHandle{ result };
     }
 
@@ -64,6 +57,8 @@ namespace gauzy
         handle{ createWindow(this, title, size) },
         renderer{ handle }
     {
+        SetWindowSubclass(static_cast<HWND>(handle), Window::GauzyWindowProc,
+            0, reinterpret_cast<LONG_PTR>(this));
     }
 
     void Window::show() const
@@ -79,23 +74,23 @@ namespace gauzy
         }
     }
 
-    void Window::release()
+    void Window::paint()
     {
-        renderer.release();
+        renderer.render(topGroup);
     }
 
-    type::WindowHandle Window::getWindowHandle() const
+    const type::WindowHandle& Window::getWindowHandle() const noexcept
     {
         return handle;
     }
 
-    graphic::Renderer& Window::getRenderer()
+    comp::CompGroup& Window::getTopGroup() noexcept
     {
-        return renderer;
+        return topGroup;
     }
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-    LRESULT GauzyWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+    LRESULT Window::GauzyWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
             UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
         auto* window = reinterpret_cast<Window*>(dwRefData);      //NOLINT(performance-no-int-to-ptr)
@@ -109,15 +104,23 @@ namespace gauzy
                 return 0;
             
             case WM_SIZE:
-                window->getRenderer().updateSize();
+                window->renderer.updateSize();
                 break;
 
+            case WM_PAINT:
+                window->paint();
+                break;
             
             default:
                 break;
         }
 
         return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+    }
+
+    void Window::release()
+    {
+        renderer.release();
     }
 
 } // namespace gauzy::comp

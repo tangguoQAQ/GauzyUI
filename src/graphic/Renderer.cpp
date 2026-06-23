@@ -1,37 +1,25 @@
 ﻿#include "graphic/Renderer.hpp"
 
 #include <stdexcept>
+#include <wil/result.h>
 
-template<typename T>
-inline void safeRelease(T **ppInterfaceToRelease)
-{
-    if (*ppInterfaceToRelease != nullptr)
-    {
-        (*ppInterfaceToRelease)->Release();
-        (*ppInterfaceToRelease) = nullptr;
-    }
-}
+#include "comp/Component.hpp"
 
 namespace gauzy::graphic {
     Renderer::Renderer(type::WindowHandle handle) : windowHandle(handle)
     {
         D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pD2DFactory);
 
-        pD2DFactory->CreateHwndRenderTarget(
+        THROW_IF_FAILED(pD2DFactory->CreateHwndRenderTarget(
             D2D1::RenderTargetProperties(),
             D2D1::HwndRenderTargetProperties(static_cast<HWND>(windowHandle)),
-            &pRenderTarget);
+            &pRenderTarget));
         updateSize();
 
-        DWriteCreateFactory(
+        THROW_IF_FAILED(DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
             __uuidof(IDWriteFactory),
-            reinterpret_cast<IUnknown**>(&pDWriteFactory));
-
-        if(pRenderTarget == nullptr || pDWriteFactory == nullptr)
-        {
-            throw std::runtime_error("Failed to intialize D2D");
-        }
+            reinterpret_cast<IUnknown**>(&pDWriteFactory)));
     }
 
 
@@ -46,16 +34,27 @@ namespace gauzy::graphic {
         pRenderTarget->Resize(size);
     }
 
-    type::SizeU Renderer::getSize() const
+
+    void Renderer::render(comp::Component& component)
     {
-        return renderTargetSize;
+        pRenderTarget->BeginDraw();
+
+        pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::BlanchedAlmond));
+        component.render(*this);
+
+        pRenderTarget->EndDraw();
     }
 
     void Renderer::release()
     {
-        safeRelease(&pRenderTarget);
-        safeRelease(&pD2DFactory);
-        safeRelease(&pDWriteFactory);
+        pRenderTarget.reset();
+        pDWriteFactory.reset();
+        pD2DFactory.reset();
+    }
+
+    type::SizeU Renderer::getSize() const
+    {
+        return renderTargetSize;
     }
 
     void Renderer::drawLine(const type::Position2F& start, const type::Position2F& end)

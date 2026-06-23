@@ -2,7 +2,7 @@
     "version": 5,
     "configurePresets": [
         {
-            "name": "ninja-clang-base",
+            "name": "ninja-msvc-base",
             "hidden": true,
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
@@ -15,22 +15,22 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_CXX_COMPILER": "cl.exe",
                 "VCPKG_TARGET_TRIPLET": "x64-windows"
             }
         },
         {
-            "name": "ninja-clang-debug",
-            "displayName": "Ninja & Clang x64 Debug",
-            "inherits": "ninja-clang-base",
+            "name": "ninja-msvc-debug",
+            "displayName": "Ninja & Cl x64 Debug",
+            "inherits": "ninja-msvc-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "ninja-clang-release",
-            "displayName": "Ninja & Clang x64 Release",
-            "inherits": "ninja-clang-base",
+            "name": "ninja-msvc-release",
+            "displayName": "Ninja & Cl x64 Release",
+            "inherits": "ninja-msvc-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
