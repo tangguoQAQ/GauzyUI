@@ -11,15 +11,16 @@
 namespace gauzy
 {
     constexpr wchar_t CLASS_NAME[] = L"GauzyWindowClass";
-    
+
     static void registerWindowClass(HINSTANCE hInstance)
     {
-        
+
         WNDCLASSEXW wc{};
         wc.cbSize = sizeof(WNDCLASSEXW);
         wc.style = CS_HREDRAW | CS_VREDRAW;
         wc.lpfnWndProc = DefWindowProc;
         wc.hInstance = hInstance;
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
         wc.lpszClassName = CLASS_NAME;
@@ -27,15 +28,15 @@ namespace gauzy
         RegisterClassExW(&wc);
     }
 
-    static type::WindowHandle createWindow(Window* thisPtr, const std::string& title, const gauzy::type::SizeU& size)
+    static type::WindowHandle createWindow(const std::string& title, const type::SizeU& size)
     {
         const HINSTANCE hInstance = GetModuleHandle(nullptr);
 
         static std::once_flag gauzyWindowClassFlag;
         std::call_once(gauzyWindowClassFlag, registerWindowClass, hInstance);
 
-        std::wstring wideTitle = util::utf8ToWide(title);
-        HWND result = CreateWindowEx(
+        const std::wstring wideTitle = util::utf8ToWide(title);
+        const HWND result = CreateWindowEx(
             0,
             CLASS_NAME,
             wideTitle.c_str(),
@@ -53,16 +54,18 @@ namespace gauzy
         return type::WindowHandle{ result };
     }
 
-    Window::Window(const std::string& title, const gauzy::type::SizeU& size) :
-        handle{ createWindow(this, title, size) },
+    Window::Window(const std::string& title, const type::SizeU& size) :
+        handle{ createWindow(title, size) },
         renderer{ handle }
     {
-        SetWindowSubclass(static_cast<HWND>(handle), Window::GauzyWindowProc,
+        SetWindowSubclass(static_cast<HWND>(handle), GauzyWindowProc,
             0, reinterpret_cast<LONG_PTR>(this));
     }
 
-    void Window::show() const
+    void Window::show()
     {
+        onRendererRegistry.trigger(event::EventContextWith{ renderer });
+
         ShowWindow(static_cast<HWND>(handle), SW_SHOW);
         UpdateWindow(static_cast<HWND>(handle));
 
@@ -102,7 +105,7 @@ namespace gauzy
                 PostQuitMessage(0);
 
                 return 0;
-            
+
             case WM_SIZE:
                 window->renderer.updateSize();
                 break;
@@ -110,7 +113,7 @@ namespace gauzy
             case WM_PAINT:
                 window->paint();
                 break;
-            
+
             default:
                 break;
         }
