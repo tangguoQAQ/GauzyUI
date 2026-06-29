@@ -8,6 +8,7 @@
 #include "type/WindowHandle.hpp"
 #include "graphic/Renderer.hpp"
 #include "comp/CompGroup.hpp"
+#include "event/Event.hpp"
 
 namespace gauzy
 {
@@ -17,12 +18,14 @@ namespace gauzy
     class Window
     {
     public:
-        Window(const std::string& title, const gauzy::type::SizeU& size);
+        event::Event<event::EventContextWith<graphic::Renderer>> onRendererRegistry;
+
+        Window(const std::string& title, const type::SizeU& size);
         
         /**
          * @brief 显示窗口并进入消息循环，此函数会将阻塞直到窗口关闭。
          */
-        void show() const;
+        void show();
 
         /**
          * @brief 重画窗口客户区。

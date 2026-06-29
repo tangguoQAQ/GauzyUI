@@ -1,14 +1,13 @@
 ﻿#include "graphic/Renderer.hpp"
 
-#include <stdexcept>
 #include <wil/result.h>
 
 #include "comp/Component.hpp"
 
 namespace gauzy::graphic {
-    Renderer::Renderer(type::WindowHandle handle) : windowHandle(handle)
+    Renderer::Renderer(const type::WindowHandle& handle) : windowHandle(handle)
     {
-        D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pD2DFactory);
+        THROW_IF_FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pD2DFactory));
 
         THROW_IF_FAILED(pD2DFactory->CreateHwndRenderTarget(
             D2D1::RenderTargetProperties(),
@@ -28,10 +27,10 @@ namespace gauzy::graphic {
         RECT clientRect;
         GetClientRect(static_cast<HWND>(windowHandle), &clientRect);
 
-        auto size = D2D1::SizeU(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+        const auto size = D2D1::SizeU(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
         renderTargetSize = size;
 
-        pRenderTarget->Resize(size);
+        THROW_IF_FAILED(pRenderTarget->Resize(size));
     }
 
 
@@ -42,7 +41,7 @@ namespace gauzy::graphic {
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::BlanchedAlmond));
         component.render(*this);
 
-        pRenderTarget->EndDraw();
+        THROW_IF_FAILED(pRenderTarget->EndDraw());
     }
 
     void Renderer::release()
@@ -57,9 +56,26 @@ namespace gauzy::graphic {
         return renderTargetSize;
     }
 
-    void Renderer::drawLine(const type::Position2F& start, const type::Position2F& end)
+    SolidColorBrush Renderer::registerSolidColorBrush(const SolidColorBrush& brush)
     {
+        if(brushMap.find(brush) == brushMap.end())
+        {
+            ID2D1SolidColorBrush* pBrush{ nullptr };
+            THROW_IF_FAILED(pRenderTarget->CreateSolidColorBrush(static_cast<D2D1::ColorF>(brush.color), &pBrush));
 
+            brushMap[brush] = pBrush;
+        }
+
+        return brush;
+    }
+
+    void Renderer::drawLine(const type::Position2F& start, const type::Position2F& end, const Brush& brush) const
+    {
+        const auto pBrush = brushMap.at(brush);
+
+        pRenderTarget->DrawLine(static_cast<D2D1_POINT_2F>(start),
+            static_cast<D2D1_POINT_2F>(end),
+            pBrush.get());
     }
 
 } // namespace gauzy::graphic

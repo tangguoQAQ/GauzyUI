@@ -10,5 +10,6 @@
   -readability-identifier-length,
   -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-  -cppcoreguidelines-pro-type-reinterpret-cast
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-non-private-member-variables-in-classes
 

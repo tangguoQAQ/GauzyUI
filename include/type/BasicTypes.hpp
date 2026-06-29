@@ -1,12 +1,11 @@
-﻿/**
- * @brief GauzyUI 框架基本类型的头文件。包含 `Position2F`, `SizeF` 等，封装了与 D2D 类型的桥接。
- */
-
-#pragma once
+﻿#pragma once
 
 #include <Eigen/Core>
 #include <d2d1.h>
 
+/**
+ * @brief GauzyUI 框架基本类型的头文件。包含 `Position2F`, `SizeF` 等，封装了与 D2D 类型的桥接。
+ */
 namespace gauzy::type
 {
     class Position2U;
