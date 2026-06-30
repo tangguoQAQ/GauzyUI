@@ -44,4 +44,9 @@ namespace gauzy::graphic
         seed ^= (seed << 6) + (seed >> 2) + 0x0D389A09 + color.hash();
         return seed;
     }
+
+    D2D1_BRUSH_PROPERTIES SolidColorBrush::toD2DProperties() const
+    {
+        return D2D1::BrushProperties(opacity);
+    }
 }

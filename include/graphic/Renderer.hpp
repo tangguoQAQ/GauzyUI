@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <unordered_map>
 #include <cstddef>
+#include <unordered_map>
 
 #include <d2d1.h>
 #include <dwrite.h>
@@ -72,6 +72,6 @@ namespace gauzy::graphic
         wil::com_ptr<ID2D1HwndRenderTarget> pRenderTarget;
         wil::com_ptr<IDWriteFactory> pDWriteFactory;
 
-        std::unordered_map<Brush, wil::com_ptr<ID2D1Brush>> brushMap;
+        std::unordered_map<std::size_t, wil::com_ptr<ID2D1Brush>> brushMap;
     };
 } // namespace gauzy::graphic

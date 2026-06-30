@@ -58,12 +58,14 @@ namespace gauzy::graphic {
 
     SolidColorBrush Renderer::registerSolidColorBrush(const SolidColorBrush& brush)
     {
-        if(brushMap.find(brush) == brushMap.end())
+        if(const std::size_t hash{ brush.hash() };
+            brushMap.find(hash) == brushMap.end())
         {
             ID2D1SolidColorBrush* pBrush{ nullptr };
-            THROW_IF_FAILED(pRenderTarget->CreateSolidColorBrush(static_cast<D2D1::ColorF>(brush.color), &pBrush));
+            THROW_IF_FAILED(pRenderTarget->CreateSolidColorBrush(static_cast<D2D1::ColorF>(brush.color),
+                brush.toD2DProperties(), &pBrush));
 
-            brushMap[brush] = pBrush;
+            brushMap[hash] = pBrush;
         }
 
         return brush;
@@ -71,7 +73,7 @@ namespace gauzy::graphic {
 
     void Renderer::drawLine(const type::Position2F& start, const type::Position2F& end, const Brush& brush) const
     {
-        const auto pBrush = brushMap.at(brush);
+        const auto pBrush = brushMap.at(brush.hash());
 
         pRenderTarget->DrawLine(static_cast<D2D1_POINT_2F>(start),
             static_cast<D2D1_POINT_2F>(end),

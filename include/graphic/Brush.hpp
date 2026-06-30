@@ -26,6 +26,8 @@ namespace gauzy::graphic
         virtual bool operator==(const Brush& rhs) const noexcept;
         virtual bool operator!=(const Brush& rhs) const noexcept;
 
+
+
         [[nodiscard]] virtual std::size_t hash() const noexcept;
     };
 
@@ -42,6 +44,8 @@ namespace gauzy::graphic
         virtual bool operator!=(const SolidColorBrush& rhs) const noexcept;
 
         [[nodiscard]] std::size_t hash() const noexcept override;
+
+        [[nodiscard]] D2D1_BRUSH_PROPERTIES toD2DProperties() const;
     };
 
     /**
