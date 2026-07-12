@@ -13,7 +13,8 @@
 namespace gauzy
 {
     /**
-     * @brief 薄云窗口类。窗口类名为 `GauzyWindowClass` 。
+     * @brief 薄云窗口类。窗口类名为 `Ga
+     * uzyWindowClass` 。
      */
     class Window
     {
@@ -34,6 +35,10 @@ namespace gauzy
 
         [[nodiscard]] const type::WindowHandle& getWindowHandle() const noexcept;
 
+        [[nodiscard]] const type::SizeU& getSize() const noexcept;
+
+        [[nodiscard]] type::SizeU getClientSize() const;
+
         /**
         * @brief 获取窗口的顶级组件群。
         */
@@ -41,6 +46,7 @@ namespace gauzy
 
     private:
         type::WindowHandle handle;
+        type::SizeU size;
 
         graphic::Renderer renderer;
 

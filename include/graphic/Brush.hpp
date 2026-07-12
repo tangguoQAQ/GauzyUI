@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <functional>
 
@@ -7,8 +7,7 @@
 namespace gauzy::graphic
 {
     /**
-     * @brief 画刷基类。使用前必须监听对应窗口的 `onRendererRegistry` 事件并注册画刷，注册的画刷直到其所属渲染器析构时才被销毁。
-     * @details 画刷决定了图形元素的绘制样式，如颜色、图像和透明度。
+     * @brief 画刷基类。画刷决定图形元素的绘制样式，如颜色、图像和透明度。
      */
     struct Brush
     {
@@ -26,9 +25,9 @@ namespace gauzy::graphic
         virtual bool operator==(const Brush& rhs) const noexcept;
         virtual bool operator!=(const Brush& rhs) const noexcept;
 
-
-
         [[nodiscard]] virtual std::size_t hash() const noexcept;
+
+        [[nodiscard]] virtual D2D1_BRUSH_PROPERTIES toD2DProperties() const;
     };
 
     /**
@@ -44,8 +43,6 @@ namespace gauzy::graphic
         virtual bool operator!=(const SolidColorBrush& rhs) const noexcept;
 
         [[nodiscard]] std::size_t hash() const noexcept override;
-
-        [[nodiscard]] D2D1_BRUSH_PROPERTIES toD2DProperties() const;
     };
 
     /**
@@ -74,12 +71,3 @@ namespace gauzy::graphic
 
     // TODO: 纹理画刷 / 图案画刷？
 } // namespace gauzy::graphic
-
-template <>
-struct std::hash<gauzy::graphic::Brush>
-{
-    std::size_t operator()(const gauzy::graphic::Brush& brush) const noexcept
-    {
-        return brush.hash();
-    }
-};

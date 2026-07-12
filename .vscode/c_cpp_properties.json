@@ -11,10 +11,8 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.22000.0",
-            "compilerPath": "D:/LLVM/bin/clang.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-clang-x86",
             "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],

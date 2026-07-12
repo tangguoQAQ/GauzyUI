@@ -56,6 +56,7 @@ namespace gauzy
 
     Window::Window(const std::string& title, const type::SizeU& size) :
         handle{ createWindow(title, size) },
+        size{ size },
         renderer{ handle }
     {
         SetWindowSubclass(static_cast<HWND>(handle), GauzyWindowProc,
@@ -85,6 +86,19 @@ namespace gauzy
     const type::WindowHandle& Window::getWindowHandle() const noexcept
     {
         return handle;
+    }
+
+    const type::SizeU& Window::getSize() const noexcept
+    {
+        return size;
+    }
+
+    type::SizeU Window::getClientSize() const
+    {
+        RECT rect{};
+        GetClientRect(static_cast<HWND>(handle), &rect);
+
+        return type::SizeU{ rect.right - rect.left, rect.bottom - rect.top };
     }
 
     comp::CompGroup& Window::getTopGroup() noexcept

@@ -1,4 +1,4 @@
-#include "graphic/Brush.hpp"
+﻿#include "graphic/Brush.hpp"
 
 namespace gauzy::graphic
 {
@@ -23,6 +23,11 @@ namespace gauzy::graphic
         return seed;
     }
 
+    D2D1_BRUSH_PROPERTIES Brush::toD2DProperties() const
+    {
+        return D2D1::BrushProperties(opacity);
+    }
+
     SolidColorBrush::SolidColorBrush(const type::Color& color) noexcept : color(color)
     {
     }
@@ -44,9 +49,5 @@ namespace gauzy::graphic
         seed ^= (seed << 6) + (seed >> 2) + 0x0D389A09 + color.hash();
         return seed;
     }
-
-    D2D1_BRUSH_PROPERTIES SolidColorBrush::toD2DProperties() const
-    {
-        return D2D1::BrushProperties(opacity);
-    }
+    
 }

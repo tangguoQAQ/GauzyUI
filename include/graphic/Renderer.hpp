@@ -8,6 +8,7 @@
 #include <wil/com.h>
 
 #include "Brush.hpp"
+#include "graphic/TextFormat.hpp"
 #include "type/WindowHandle.hpp"
 #include "type/BasicTypes.hpp"
 
@@ -56,13 +57,11 @@ namespace gauzy::graphic
          */
         [[nodiscard]] type::SizeU getSize() const;
 
-        /**
-         * @brief 向此渲染器注册实色画刷。请在对应窗口的 `WindowEvent::REGISTRY_RENDERER` 事件处理器中调用。
-         */
-        SolidColorBrush registerSolidColorBrush(const SolidColorBrush& brush);
-
         void drawLine(const type::Position2F& start, const type::Position2F& end,
             const Brush& brush) const;
+
+        void drawText(const type::Position2F& position, const std::string& text,
+            const Brush& brush, const TextFormat& textFormat) const;
 
     private:
         type::WindowHandle windowHandle;
@@ -72,6 +71,10 @@ namespace gauzy::graphic
         wil::com_ptr<ID2D1HwndRenderTarget> pRenderTarget;
         wil::com_ptr<IDWriteFactory> pDWriteFactory;
 
-        std::unordered_map<std::size_t, wil::com_ptr<ID2D1Brush>> brushMap;
+        mutable std::unordered_map<std::size_t, wil::com_ptr<ID2D1Brush>> brushMap;
+        const wil::com_ptr<ID2D1Brush>& getOrCreateBrush(const Brush& brush) const;
+        
+        mutable std::unordered_map<std::size_t, wil::com_ptr<IDWriteTextFormat>> textFormatCache;
+        const wil::com_ptr<IDWriteTextFormat>& getOrCreateTextFormat(const TextFormat& textFormat) const;
     };
 } // namespace gauzy::graphic

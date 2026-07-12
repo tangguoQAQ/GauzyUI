@@ -27,7 +27,7 @@ namespace gauzy::comp
          * @param newChildren 带加入组件，可以是多个，也可为空。
          * 
          * @warning 当传入右值时，如构造返回的临时对象 `CompGroup(SomeComp{...})` ，会移动存入该组件群，这是一般的做法。但如果传入左值
-         * 引用，如 `CompGroup(someComp)` ，则会 *复制* 存入该组件群，要注意未来对原对象的修改不会同步已存入群中的组件。
+         * 引用，如 `CompGroup(someComp)` ，则会 *复制* 存入该组件群，要注意未来对原对象的修改不会同步到已存入群中的组件。
          */
         template <typename... Comps>
         explicit CompGroup(Comps&&... newChildren);
@@ -39,7 +39,7 @@ namespace gauzy::comp
          * @param newChildren 带加入组件，可以是多个，但不可为空。
          * 
          * @warning 当传入右值时，如构造返回的临时对象 `group.add(SomeComp{...})` ，会移动存入该组件群，这是一般的做法。但如果传入左值
-         * 引用，如 `group.add(someComp)` ，则会 *复制* 存入该组件群，要注意未来对原对象的修改不会同步已存入群中的组件。
+         * 引用，如 `group.add(someComp)` ，则会 *复制* 存入该组件群，要注意未来对原对象的修改不会同步到已存入群中的组件。
          */
         template <typename... Comps>
         void add(Comps&&... newChildren);
