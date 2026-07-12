@@ -43,7 +43,7 @@ namespace gauzy::event
 
         T& getObject() noexcept;
 
-        const T& getObject() const noexcept;
+        [[nodiscard]] const T& getObject() const noexcept;
 
         T* operator->() noexcept;
 

@@ -4,6 +4,9 @@
 
 namespace gauzy::comp
 {
+    /**
+     * @brief 标签类，用于显示静态文本，文字背景透明（不绘制背景矩形）。
+     */
     class Label : public Component
     {
     public:

@@ -6,6 +6,7 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include <wil/com.h>
+#include <Eigen/Core>
 
 #include "Brush.hpp"
 #include "Theme.hpp"
@@ -62,6 +63,13 @@ namespace gauzy::graphic
          * @brief 获取主题对象，决定组件的视觉样式。注意返回的引用是可修改的。
          */
         [[nodiscard]] Theme& theme() noexcept;
+
+        [[nodiscard]] Eigen::Vector2f getDpi() const;
+
+        /**
+         * @brief 一般无需主动调用，当所属 `gauzy::Window` 对象 DPI 变化时（ `WM_DPICHANGED` ）自动更新 DPI 缩放比。
+         */
+        void updateDpi(float dpiX, float dpiY);
 
         void drawLine(const type::Position2F& start, const type::Position2F& end,
             const Brush& brush) const;

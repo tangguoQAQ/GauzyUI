@@ -62,6 +62,19 @@ namespace gauzy::graphic {
         return theme_;
     }
 
+    Eigen::Vector2f Renderer::getDpi() const
+    {
+        Eigen::Vector2f dpi;
+        pRenderTarget->GetDpi(&dpi.x(), &dpi.y());
+
+        return dpi;
+    }
+
+    void Renderer::updateDpi(float dpiX, float dpiY)
+    {
+        pRenderTarget->SetDpi(dpiX, dpiY);
+    }
+
     const wil::com_ptr<ID2D1Brush>& Renderer::getOrCreateBrush(const Brush& brush) const
     {
         const std::size_t hash{ brush.hash() };

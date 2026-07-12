@@ -2,6 +2,7 @@
 
 #include <mutex>
 #include <stdexcept>
+#include <cmath>
 
 #include <commctrl.h>
 #include <winuser.h>
@@ -30,19 +31,26 @@ namespace gauzy
 
     static type::WindowHandle createWindow(const std::string& title, const type::SizeU& size)
     {
+        SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
         const HINSTANCE hInstance = GetModuleHandle(nullptr);
 
         static std::once_flag gauzyWindowClassFlag;
         std::call_once(gauzyWindowClassFlag, registerWindowClass, hInstance);
 
         const std::wstring wideTitle = util::utf8ToWide(title);
+        const float dpiScale = static_cast<float>(GetDpiForSystem()) / 96.0F;
+        // NOLINTNEXTLINE(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
+        const int pixelWidth  = std::lroundf(size.x() * dpiScale);
+        // NOLINTNEXTLINE(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
+        const int pixelHeight = std::lroundf(size.y() * dpiScale);
         const HWND result = CreateWindowEx(
             0,
             CLASS_NAME,
             wideTitle.c_str(),
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT,
-            static_cast<int>(size.x()), static_cast<int>(size.y()),
+            pixelWidth, pixelHeight,
             nullptr, nullptr, hInstance, nullptr
         );
 
@@ -120,19 +128,37 @@ namespace gauzy
         switch(uMsg)
         {
             case WM_DESTROY:
+            {
                 window->release();
                 PostQuitMessage(0);
 
                 return 0;
-
+            }
             case WM_SIZE:
+            {
                 window->renderer.updateSize();
                 break;
-
+            }
             case WM_PAINT:
+            {
                 window->paint();
                 break;
+            }
+            case WM_DPICHANGED:
+            {
+                const auto dpiX = static_cast<float>(LOWORD(wParam));
+                const auto dpiY = static_cast<float>(HIWORD(wParam));
+                window->renderer.updateDpi(dpiX, dpiY);
 
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+                const auto* rect = reinterpret_cast<RECT*>(lParam);
+                SetWindowPos(hWnd, nullptr,
+                    rect->left, rect->top,
+                    rect->right - rect->left,
+                    rect->bottom - rect->top,
+                    SWP_NOZORDER | SWP_NOACTIVATE);
+                break;
+            }
             default:
                 break;
         }
