@@ -39,7 +39,7 @@ namespace gauzy::graphic {
     {
         pRenderTarget->BeginDraw();
 
-        pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::BlanchedAlmond));
+        pRenderTarget->Clear(static_cast<D2D1::ColorF>(theme_.backgroundColor));
         component.render(*this);
 
         THROW_IF_FAILED(pRenderTarget->EndDraw());
@@ -52,9 +52,14 @@ namespace gauzy::graphic {
         pD2DFactory.reset();
     }
 
-    type::SizeU Renderer::getSize() const
+    type::SizeU Renderer::getSize() const noexcept
     {
         return renderTargetSize;
+    }
+
+    Theme& Renderer::theme() noexcept
+    {
+        return theme_;
     }
 
     const wil::com_ptr<ID2D1Brush>& Renderer::getOrCreateBrush(const Brush& brush) const
@@ -73,10 +78,8 @@ namespace gauzy::graphic {
 
             return brushMap[hash] = pBrush;
         }
-        else
-        {
-            throw std::runtime_error("Unsupported brush type.");
-        }
+        
+        throw std::runtime_error("Unsupported brush type.");
     }
 
     const wil::com_ptr<IDWriteTextFormat>& Renderer::getOrCreateTextFormat(const TextFormat& textFormat) const

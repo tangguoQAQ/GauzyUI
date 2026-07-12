@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -18,7 +18,7 @@ namespace gauzy::type
         std::uint32_t value;
 
         explicit Color(std::uint32_t hex = 0xFF000000) noexcept;
-        explicit Color(std::uint32_t rgb, std::uint8_t alpha) noexcept;
+        Color(std::uint32_t rgb, float alpha) noexcept;
         Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 255) noexcept;
 
         bool operator==(const Color& rhs) const noexcept;

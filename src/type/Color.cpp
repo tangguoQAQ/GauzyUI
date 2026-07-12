@@ -6,8 +6,8 @@ namespace gauzy::type
     {
     }
 
-    Color::Color(const std::uint32_t rgb, const std::uint8_t alpha) noexcept :
-        value( alpha << 24 | rgb)
+    Color::Color(const std::uint32_t rgb, const float alpha) noexcept :
+        value( static_cast<std::uint8_t>(alpha * 255) << 24 | rgb)
     {
     }
 

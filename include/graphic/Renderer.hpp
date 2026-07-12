@@ -8,6 +8,7 @@
 #include <wil/com.h>
 
 #include "Brush.hpp"
+#include "Theme.hpp"
 #include "graphic/TextFormat.hpp"
 #include "type/WindowHandle.hpp"
 #include "type/BasicTypes.hpp"
@@ -55,7 +56,12 @@ namespace gauzy::graphic
         /**
          * @brief 获取渲染目标尺寸，单位为像素。
          */
-        [[nodiscard]] type::SizeU getSize() const;
+        [[nodiscard]] type::SizeU getSize() const noexcept;
+
+        /**
+         * @brief 获取主题对象，决定组件的视觉样式。注意返回的引用是可修改的。
+         */
+        [[nodiscard]] Theme& theme() noexcept;
 
         void drawLine(const type::Position2F& start, const type::Position2F& end,
             const Brush& brush) const;
@@ -71,7 +77,8 @@ namespace gauzy::graphic
 
     private:
         type::WindowHandle windowHandle;
-        type::SizeU renderTargetSize{0U, 0U};
+        type::SizeU renderTargetSize{ 0U, 0U };
+        Theme theme_{ GAUZY_DARK_THEME };
 
         wil::com_ptr<ID2D1Factory> pD2DFactory;
         wil::com_ptr<ID2D1HwndRenderTarget> pRenderTarget;

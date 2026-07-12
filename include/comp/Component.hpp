@@ -22,7 +22,7 @@ namespace gauzy::comp
         Component &operator=(Component &&) = default;
         virtual ~Component() = default;
 
-        Component(type::Position2F  position, type::SizeF  size) noexcept;
+        Component(type::Position2F position, type::SizeF size) noexcept;
 
         [[nodiscard]] type::Position2F getPosition() const noexcept;
         void setPosition(type::Position2F newPosition) noexcept;

@@ -2,38 +2,21 @@
 
 #include "Window.hpp"
 #include "type/BasicTypes.hpp"
-#include "comp/Component.hpp"
-#include "graphic/Brush.hpp"
-
-const gauzy::graphic::SolidColorBrush TEST_BRUSH{ gauzy::type::Color{ 0xF0F000F0 } };
-
-const gauzy::graphic::TextFormat TEST_TEXT_FORMAT{ "微软雅黑" };
-
-class TestComp : public gauzy::comp::Component
-{
-public:
-    void render(gauzy::graphic::Renderer& renderer) override
-    {
-        static const gauzy::graphic::SolidColorBrush TEST2_BRUSH{ gauzy::type::Color{ 0xFF0000F0 } };
-
-        renderer.drawLine({ 0U, 0U }, { 800U, 600U }, TEST_BRUSH);
-        renderer.drawLine({ 0U, 600U }, { 800U, 0U }, TEST2_BRUSH);
-        renderer.drawRect({ 100U, 100U }, { 200U, 150U }, TEST2_BRUSH);
-        renderer.fillRect({ 300U, 100U }, { 200U, 150U }, TEST_BRUSH);
-
-        renderer.drawText({ 0U, 0U }, "Hello, World!",
-            TEST_BRUSH, TEST_TEXT_FORMAT);
-    }
-};
+#include "comp/Label.hpp"
+#include "graphic/Theme.hpp"
 
 int main()
 {
-    gauzy::Window testWindow{ u8"薄云窗口测试 Gauzy Window Test", gauzy::type::SizeU{ 800U, 600U } };
-    testWindow.onRendererRegistry.subscribe([] (auto& e)
-    {
-        std::cout << "Renderer registry\n" << std::flush;
-    });
-    testWindow.getTopGroup().add(TestComp{});
+    using namespace gauzy;
+    using namespace gauzy::type;
+    
+    Window testWindow{ u8"薄云窗口测试 Gauzy Window Test", SizeU{ 800U, 600U } };
+    testWindow.theme() = graphic::GAUZY_DARK_THEME;
+
+    testWindow.getTopGroup().add(
+        comp::Label{ u8"Hello, World!", Position2F{ 16.0F, 16.0F }, SizeF{ 200.0F, 32.0F } },
+        comp::Label{ u8"你好，世界！", Position2F{ 16.0F, 48.0F }, SizeF{ 200.0F, 32.0F } });
+    
     testWindow.show();
 
     return 0;

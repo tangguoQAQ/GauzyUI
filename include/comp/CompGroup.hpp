@@ -53,7 +53,7 @@ namespace gauzy::comp
     template <typename... Comps>
     CompGroup::CompGroup(Comps&&... newChildren)
     {
-        if constexpr (sizeof...(newChildren) != 0)
+        if constexpr(sizeof...(newChildren) != 0)
         {
             // 没有模板参数的话，std::forward 退化成 std::move，完美转发失效。
             add(std::forward<Comps>(newChildren)...);

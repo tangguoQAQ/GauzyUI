@@ -101,6 +101,11 @@ namespace gauzy
         return type::SizeU{ rect.right - rect.left, rect.bottom - rect.top };
     }
 
+    graphic::Theme& Window::theme() noexcept
+    {
+        return renderer.theme();
+    }
+
     comp::CompGroup& Window::getTopGroup() noexcept
     {
         return topGroup;

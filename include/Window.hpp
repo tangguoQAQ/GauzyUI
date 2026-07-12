@@ -7,6 +7,7 @@
 #include "type/BasicTypes.hpp"
 #include "type/WindowHandle.hpp"
 #include "graphic/Renderer.hpp"
+#include "graphic/Theme.hpp"
 #include "comp/CompGroup.hpp"
 #include "event/Event.hpp"
 
@@ -38,6 +39,11 @@ namespace gauzy
         [[nodiscard]] const type::SizeU& getSize() const noexcept;
 
         [[nodiscard]] type::SizeU getClientSize() const;
+
+        /**
+         * @brief 获取主题对象，决定组件的视觉样式。注意返回的引用是可修改的。
+         */
+        [[nodiscard]] graphic::Theme& theme() noexcept;
 
         /**
         * @brief 获取窗口的顶级组件群。
