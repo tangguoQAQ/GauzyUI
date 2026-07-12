@@ -62,6 +62,12 @@ namespace gauzy::graphic
 
         void drawText(const type::Position2F& position, const std::string& text,
             const Brush& brush, const TextFormat& textFormat) const;
+        
+        void drawRect(const type::Position2F& topLeft, const type::SizeF& size,
+            const Brush& brush) const;
+        
+        void fillRect(const type::Position2F& topLeft, const type::SizeF& size,
+            const Brush& brush) const;
 
     private:
         type::WindowHandle windowHandle;

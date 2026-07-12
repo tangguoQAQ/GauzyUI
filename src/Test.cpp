@@ -18,8 +18,9 @@ public:
 
         renderer.drawLine({ 0U, 0U }, { 800U, 600U }, TEST_BRUSH);
         renderer.drawLine({ 0U, 600U }, { 800U, 0U }, TEST2_BRUSH);
+        renderer.drawRect({ 100U, 100U }, { 200U, 150U }, TEST2_BRUSH);
+        renderer.fillRect({ 300U, 100U }, { 200U, 150U }, TEST_BRUSH);
 
-        
         renderer.drawText({ 0U, 0U }, "Hello, World!",
             TEST_BRUSH, TEST_TEXT_FORMAT);
     }

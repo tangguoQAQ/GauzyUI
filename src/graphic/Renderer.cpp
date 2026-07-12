@@ -126,4 +126,26 @@ namespace gauzy::graphic {
         pRenderTarget->DrawText(wideText.c_str(), static_cast<UINT32>(wideText.length()),
             pTextFormat.get(), &layoutRect, pBrush.get());
     }
+
+    void Renderer::drawRect(const type::Position2F & topLeft, const type::SizeF & size,
+        const Brush & brush) const
+    {
+        const auto pBrush = getOrCreateBrush(brush);
+
+        const D2D1_RECT_F rect{ topLeft.x(), topLeft.y(),
+            topLeft.x() + size.x(), topLeft.y() + size.y() };
+
+        pRenderTarget->DrawRectangle(&rect, pBrush.get());
+    }
+
+    void Renderer::fillRect(const type::Position2F& topLeft, const type::SizeF& size, const Brush& brush) const
+    {
+        const auto pBrush = getOrCreateBrush(brush);
+
+        const D2D1_RECT_F rect{ topLeft.x(), topLeft.y(),
+            topLeft.x() + size.x(), topLeft.y() + size.y() };
+
+        pRenderTarget->FillRectangle(&rect, pBrush.get());
+    }
+
 } // namespace gauzy::graphic
