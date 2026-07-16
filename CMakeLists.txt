@@ -11,7 +11,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     src/Test.cpp
     src/Util.cpp
     src/Window.cpp
-    src/comp/CompGroup.cpp
+    src/comp/ComponentGroup.cpp
     src/comp/Component.cpp
     src/event/EventContext.cpp
     src/graphic/Brush.cpp
@@ -22,7 +22,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     src/type/WindowHandle.cpp
     include/Util.hpp
     include/Window.hpp
-    include/comp/CompGroup.hpp
+    include/comp/ComponentGroup.hpp
     include/comp/Component.hpp
     include/event/Event.hpp
     include/event/EventContext.hpp
@@ -35,6 +35,13 @@ target_sources(${PROJECT_NAME} PUBLIC
     include/comp/Label.hpp
     include/graphic/Theme.hpp
     src/comp/Label.cpp
+    include/event/ComponentEventContext.hpp
+    include/event/WindowEventContext.hpp
+    include/event/WindowMessageDispatcher.hpp
+    src/event/WindowMessageDispatcher.cpp
+    include/comp/Interactive.hpp
+    include/type/InputTypes.hpp
+    src/type/InputTypes.cpp
 )
 
 find_package(Eigen3 CONFIG REQUIRED)
@@ -45,4 +52,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE comctl32.lib d2d1.lib dwrite.lib Eigen3::Eigen WIL::WIL)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC UNICODE _UNICODE)
-add_compile_options("/source-charset:utf-8")
+add_compile_options("/source-charset:utf-8" "/EHsc")

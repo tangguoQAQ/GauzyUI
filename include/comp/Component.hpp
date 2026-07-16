@@ -15,22 +15,28 @@ namespace gauzy::comp
     class Component
     {
     public:
-        Component() = default;
-        Component(const Component &) = default;
-        Component(Component &&) = default;
-        Component &operator=(const Component &) = default;
-        Component &operator=(Component &&) = default;
+        Component() noexcept = default;
+        Component(const Component &) noexcept = default;
+        Component(Component &&) noexcept = default;
+        Component &operator=(const Component &) noexcept = default;
+        Component &operator=(Component &&) noexcept = default;
         virtual ~Component() = default;
 
-        Component(type::Position2F position, type::SizeF size) noexcept;
+        Component(type::Position2F pos, type::SizeF size) noexcept;
 
+        /// @note 位置是相对于窗口客户区左上角的 DIP。
         [[nodiscard]] type::Position2F getPosition() const noexcept;
-        void setPosition(type::Position2F newPosition) noexcept;
+        void setPosition(type::Position2F newPos) noexcept;
 
         [[nodiscard]] type::SizeF getSize() const noexcept;
         void setSize(type::SizeF newSize) noexcept;
 
-        // TODO: render 是 Action 操作，而不是 Event 事件。相关事件是 RENDER_EVENT PRE/POST。
+        /**
+         * @brief 检测位置是否在组件界限内，用于鼠标命中测试等。默认检测矩形界限且包含边界，若需自定义规则请覆写该函数。
+         */
+        [[nodiscard]] virtual bool contains(type::Position2F pos) const noexcept;
+
+        // TODO: render 是 Action 操作，而不是 Event 事件。
         virtual void render(graphic::Renderer& renderer) = 0;
 
     private:

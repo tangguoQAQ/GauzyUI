@@ -8,18 +8,20 @@
 namespace gauzy::graphic {
     Renderer::Renderer(const type::WindowHandle& handle) : windowHandle(handle)
     {
-        THROW_IF_FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pD2DFactory));
+        THROW_IF_FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pD2DFactory));
 
         THROW_IF_FAILED(pD2DFactory->CreateHwndRenderTarget(
             D2D1::RenderTargetProperties(),
             D2D1::HwndRenderTargetProperties(static_cast<HWND>(windowHandle)),
             &pRenderTarget));
         updateSize();
+        const auto dpi = static_cast<float>(GetDpiForWindow(static_cast<HWND>(windowHandle)));
+        updateDpi(dpi, dpi);
 
         THROW_IF_FAILED(DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
             __uuidof(IDWriteFactory),
-            reinterpret_cast<IUnknown**>(&pDWriteFactory)));
+            reinterpret_cast<IUnknown**>(&pDWriteFactory)));    // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
 
 

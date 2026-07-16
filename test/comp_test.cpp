@@ -28,9 +28,9 @@ public:
                 Button{ "Panel Button" },
                 MyComp{ "Custom 1" }
             },
-            Label{ bind( "count: {}", &count_ ) },
-            Button{ "OK", event::Clicked{ [&] () { count_++ } } },
-            Button{ "Foo", event::Clicked{ FooButtonClicked } }
+            Label{ bind("count: {}", &count_) },
+            Button{ "OK", event::Clicked { [&]() { count_++ } } },
+            Button{ "Foo", event::Clicked { FooButtonClicked } }
         };
     }
 

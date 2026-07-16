@@ -2,19 +2,29 @@
 
 namespace gauzy::event
 {
-    void EventContext::interrupt()
+    void EventContext::interrupt() noexcept
     {
         interrupted = true;
     }
 
-    void EventContext::unsubscribeThis()
+    void EventContext::unsubscribeThis() noexcept
     {
         unsubscribed = true;
     }
 
-    void EventContext::next()
+    void EventContext::resetForNext() noexcept
     {
+        interrupted = false;
         unsubscribed = false;
     }
 
+    void EventContext::cancelAction() noexcept
+    {
+        canceled = true;
+    }
+
+    bool EventContext::isCanceled() const noexcept
+    {
+        return canceled;
+    }
 }

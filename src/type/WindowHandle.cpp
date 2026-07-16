@@ -2,15 +2,15 @@
 
 namespace gauzy::type
 {
-    WindowHandle::WindowHandle() : value(nullptr)
+    WindowHandle::WindowHandle() noexcept : value(nullptr)
     {
     }
     
-    WindowHandle::WindowHandle(HWND handle) : value(handle)
+    WindowHandle::WindowHandle(HWND handle) noexcept : value(handle)
     {
     }
 
-    WindowHandle::operator HWND() const
+    WindowHandle::operator HWND() const noexcept
     {
         return value;
     }

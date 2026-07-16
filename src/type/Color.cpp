@@ -1,5 +1,7 @@
 #include "type/Color.hpp"
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
+
 namespace gauzy::type
 {
     Color::Color(const std::uint32_t hex) noexcept : value(hex)
@@ -7,7 +9,7 @@ namespace gauzy::type
     }
 
     Color::Color(const std::uint32_t rgb, const float alpha) noexcept :
-        value( static_cast<std::uint8_t>(alpha * 255) << 24 | rgb)
+        value(static_cast<std::uint8_t>(alpha * 255) << 24 | rgb)
     {
     }
 
@@ -86,6 +88,8 @@ namespace gauzy::type
 
     Color::operator D2D1::ColorF() const noexcept
     {
-        return {rgb(), a() / 255.0f};
+        return { rgb(), static_cast<float>(a()) / 255.0F };
     }
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)

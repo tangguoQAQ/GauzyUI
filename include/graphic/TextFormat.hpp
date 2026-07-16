@@ -18,7 +18,7 @@ namespace gauzy::graphic
         /**
          * @brief 字体系列，或字体族，如 "Segoe UI"、"Microsoft YaHei" 等。
          */
-        std::string fontFamily{ "Segoe UI" };
+        std::string_view fontFamily{ "Segoe UI" };
         float fontSize{ DEFAULT_FONT_SIZE };
         /**
          * @brief 字体粗细，或字重。
@@ -36,16 +36,15 @@ namespace gauzy::graphic
 
         /**
          * @brief 区域名称。不同区域设置 `fontFamily` 的本地化名称不同。
-         * 
          */
-        std::string localeName{ "zh-CN" };
+        std::string_view localeName{ "zh-CN" };
 
-        TextFormat() = default;
-        TextFormat(const TextFormat&) = default;
+        TextFormat() noexcept = default;
+        TextFormat(const TextFormat&) noexcept = default;
         TextFormat(TextFormat&&) noexcept = default;
-        TextFormat& operator=(const TextFormat&) = default;
+        TextFormat& operator=(const TextFormat&) noexcept = default;
         TextFormat& operator=(TextFormat&&) noexcept = default;
-        ~TextFormat() = default;
+        ~TextFormat() noexcept = default;
 
         bool operator==(const TextFormat& rhs) const noexcept;
         bool operator!=(const TextFormat& rhs) const noexcept;

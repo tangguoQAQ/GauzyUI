@@ -11,12 +11,13 @@ namespace gauzy::type
     class WindowHandle
     {
     public:
-        HWND value;
-        
-        WindowHandle();
-        explicit WindowHandle(HWND handle);
+        WindowHandle() noexcept;
+        explicit WindowHandle(HWND handle) noexcept;
 
-        explicit operator HWND() const;
+        explicit operator HWND() const noexcept;
+    
+    private:
+        HWND value;
     };
 
 } // namespace gauzy::type

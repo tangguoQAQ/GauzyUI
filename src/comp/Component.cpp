@@ -4,8 +4,8 @@
 
 namespace gauzy::comp
 {
-    Component::Component(type::Position2F position, type::SizeF size) noexcept :
-       position(std::move(position)), size(std::move(size))
+    Component::Component(type::Position2F pos, type::SizeF size) noexcept :
+       position(std::move(pos)), size(std::move(size))
     {
     }
 
@@ -14,9 +14,9 @@ namespace gauzy::comp
         return position;
     }
 
-    void Component::setPosition(type::Position2F newPosition) noexcept
+    void Component::setPosition(type::Position2F newPos) noexcept
     {
-        position = std::move(newPosition);
+        position = std::move(newPos);
     }
 
     type::SizeF Component::getSize() const noexcept
@@ -27,5 +27,14 @@ namespace gauzy::comp
     void Component::setSize(type::SizeF newSize) noexcept
     {
         size = std::move(newSize);
+    }
+
+
+    bool Component::contains(type::Position2F pos) const noexcept
+    {
+        return pos.x() >= this->position.x()
+            && pos.x() <= this->position.x() + this->size.x()
+            && pos.y() >= this->position.y()
+            && pos.y() <= this->position.y() + this->size.y();
     }
 }

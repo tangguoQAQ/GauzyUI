@@ -12,7 +12,7 @@ int main()
 
 	// ===== Add a event handler =====
 	// Add a event handler for the window.
-	main_window.add_event_handler([] (gauzy::event::paint e)
+	main_window.add_event_handler([](gauzy::event::paint e)
 		{
 			renderer.render();
 		});

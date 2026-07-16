@@ -2,10 +2,12 @@
 
 #include <Eigen/Core>
 #include <d2d1.h>
+#include <Windows.h>
 
 /**
  * @brief GauzyUI 框架基本类型的头文件。包含 `Position2F`, `SizeF` 等，封装了与 D2D 类型的桥接。
  */
+
 namespace gauzy::type
 {
     class Position2U;
@@ -21,6 +23,8 @@ namespace gauzy::type
         explicit operator D2D1_POINT_2F() const;
 
         explicit operator Position2U() const;
+
+        explicit Position2F(LPARAM lParam) noexcept;
     };
 
     class Position2U : public Eigen::Vector2<unsigned int>

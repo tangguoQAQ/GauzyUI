@@ -12,26 +12,27 @@ namespace gauzy::event
      * @brief 事件类。
      * @details 自定义事件请在事件源的公开成员变量中声明，命名为 `on...` ，使用 Doing 表示预事件、Done 表示后事件，
      * 并在适当位置调用 `trigger` 函数触发。
-     * @tparam EventArg 事件上下文参数类型。必须是 EventContext 及其子类（如 EventContextWith），将在事件触发时传递给监听器。
+     * @tparam EventContextArg 事件上下文参数类型。必须是 EventContext 及其子类（如 EventContextWith），将在事件触发时传递给监听器。
+     * @warning 不要在事件监听器中调用其所订阅的事件对象的任何函数，可能产生预料外的结果。控制流操作见 `EventContext` 。
      */
-    template <typename EventArg>
+    template <typename EventContextArg>
     class Event
     {
-        static_assert(std::is_base_of_v<EventContext, EventArg>,
-                      "EventArg must be derived from EventContext.");
+        static_assert(std::is_base_of_v<EventContext, EventContextArg>,
+                      "EventContextArg must be derived from EventContext.");
 
     public:
         Event() = default;
         Event(const Event& other) = default;
         Event(Event&& other) noexcept = default;
-        Event& operator=(const Event& other) = delete;
-        Event& operator=(Event&& other) noexcept = delete;
+        Event& operator=(const Event& other) = default;
+        Event& operator=(Event&& other) noexcept = default;
         ~Event() = default;
 
         /**
-         * @brief 事件监听器类型，属于可调用对象（函数指针、lambda 表达式等），接受 EventArg 类型的参数（建议参数名为 `e`）。
+         * @brief 事件监听器类型，属于可调用对象（函数指针、lambda 表达式等），接受 EventContextArg 类型的参数（建议参数名为 `e` / `ctx`）。
          */
-        using EventListener = std::function<void(EventArg&)>;
+        using EventListener = std::function<void(EventContextArg&)>;
 
         /**
          * @brief 订阅顺序，决定事件监听器加入委托列表的位置。
@@ -52,19 +53,19 @@ namespace gauzy::event
         /**
          * @brief 触发事件。按订阅顺序调用所有事件监听器。
          */
-        void trigger(EventArg& e);
+        void trigger(EventContextArg& e);
 
         /**
          * @brief 触发事件。按订阅顺序调用所有事件监听器。
          */
-        void trigger(EventArg&& e);
+        void trigger(EventContextArg&& e);
 
     private:
-        std::list<EventListener> listeners;
+        std::list<EventListener> listeners{};
     };
 
-    template <typename EventArg>
-    void Event<EventArg>::subscribe(EventListener listener, SubscriptionOrder order)
+    template <typename EventContextArg>
+    void Event<EventContextArg>::subscribe(EventListener listener, SubscriptionOrder order)
     {
         if(order == SubscriptionOrder::HEAD)
         {
@@ -76,8 +77,8 @@ namespace gauzy::event
         }
     }
 
-    template <typename EventArg>
-    void Event<EventArg>::trigger(EventArg& e)
+    template <typename EventContextArg>
+    void Event<EventContextArg>::trigger(EventContextArg& e)
     {
         for(auto it = listeners.begin(); it != listeners.end();)
         {
@@ -97,12 +98,12 @@ namespace gauzy::event
                 ++it;
             }
 
-            e.next();
+            e.resetForNext();
         }
     }
 
-    template <typename EventArg>
-    void Event<EventArg>::trigger(EventArg&& e)     // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
+    template <typename EventContextArg>
+    void Event<EventContextArg>::trigger(EventContextArg&& e)
     {
         trigger(e);
     }

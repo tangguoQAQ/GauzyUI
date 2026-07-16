@@ -22,6 +22,7 @@ namespace gauzy::comp
         void setTitle(const std::string& newTitle) noexcept;
 
         void render(graphic::Renderer& renderer) override;
+        
     private:
         std::string title;
     };

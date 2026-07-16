@@ -3,9 +3,11 @@
 #include <mutex>
 #include <stdexcept>
 #include <cmath>
+#include <optional>
 
 #include <commctrl.h>
 #include <winuser.h>
+#include <wil/result.h>
 
 #include "Util.hpp"
 
@@ -26,7 +28,7 @@ namespace gauzy
         wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
         wc.lpszClassName = CLASS_NAME;
 
-        RegisterClassExW(&wc);
+        THROW_LAST_ERROR_IF(RegisterClassEx(&wc) == 0);
     }
 
     static type::WindowHandle createWindow(const std::string& title, const type::SizeU& size)
@@ -39,18 +41,13 @@ namespace gauzy
         std::call_once(gauzyWindowClassFlag, registerWindowClass, hInstance);
 
         const std::wstring wideTitle = util::utf8ToWide(title);
-        const float dpiScale = static_cast<float>(GetDpiForSystem()) / 96.0F;
-        // NOLINTNEXTLINE(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
-        const int pixelWidth  = std::lroundf(size.x() * dpiScale);
-        // NOLINTNEXTLINE(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
-        const int pixelHeight = std::lroundf(size.y() * dpiScale);
         const HWND result = CreateWindowEx(
             0,
             CLASS_NAME,
             wideTitle.c_str(),
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT,
-            pixelWidth, pixelHeight,
+            0, 0,
             nullptr, nullptr, hInstance, nullptr
         );
 
@@ -65,16 +62,27 @@ namespace gauzy
     Window::Window(const std::string& title, const type::SizeU& size) :
         handle{ createWindow(title, size) },
         size{ size },
+        dpiScale{ static_cast<float>(GetDpiForWindow(static_cast<HWND>(handle))) / USER_DEFAULT_SCREEN_DPI },
         renderer{ handle }
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
+        const int pixelWidth = std::lroundf(size.x() * dpiScale);
+        // NOLINTNEXTLINE(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
+        const int pixelHeight = std::lroundf(size.y() * dpiScale);
+        SetWindowPos(static_cast<HWND>(handle), nullptr,
+            NULL, NULL, pixelWidth, pixelHeight, SWP_NOMOVE);
+
         SetWindowSubclass(static_cast<HWND>(handle), GauzyWindowProc,
             0, reinterpret_cast<LONG_PTR>(this));
     }
 
+    Window::~Window()
+    {
+        release();
+    }
+
     void Window::show()
     {
-        onRendererRegistry.trigger(event::EventContextWith{ renderer });
-
         ShowWindow(static_cast<HWND>(handle), SW_SHOW);
         UpdateWindow(static_cast<HWND>(handle));
 
@@ -88,7 +96,13 @@ namespace gauzy
 
     void Window::paint()
     {
-        renderer.render(topGroup);
+        PAINTSTRUCT ps{};
+        if(BeginPaint(static_cast<HWND>(handle), &ps) == nullptr)
+        {
+            return;
+        }
+        renderer.render(topGroup_);
+        EndPaint(static_cast<HWND>(handle), &ps);
     }
 
     const type::WindowHandle& Window::getWindowHandle() const noexcept
@@ -109,46 +123,56 @@ namespace gauzy
         return type::SizeU{ rect.right - rect.left, rect.bottom - rect.top };
     }
 
+    [[nodiscard]] float Window::getDpiScale() const noexcept
+    {
+        return dpiScale;
+    }
+
     graphic::Theme& Window::theme() noexcept
     {
         return renderer.theme();
     }
 
-    comp::CompGroup& Window::getTopGroup() noexcept
+    comp::ComponentGroup& Window::topGroup() noexcept
     {
-        return topGroup;
+        return topGroup_;
     }
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     LRESULT Window::GauzyWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-            UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+        UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
-        auto* window = reinterpret_cast<Window*>(dwRefData);      //NOLINT(performance-no-int-to-ptr)
+        auto& window = *reinterpret_cast<Window*>(dwRefData);      //NOLINT(performance-no-int-to-ptr)
 
         switch(uMsg)
         {
             case WM_DESTROY:
             {
-                window->release();
+                window.release();
                 PostQuitMessage(0);
-
-                return 0;
+                break;
+            }
+            case WM_NCDESTROY:
+            {
+                RemoveWindowSubclass(hWnd, GauzyWindowProc, uIdSubclass);
+                break;
             }
             case WM_SIZE:
             {
-                window->renderer.updateSize();
+                window.renderer.updateSize();
                 break;
             }
             case WM_PAINT:
             {
-                window->paint();
+                window.paint();
                 break;
             }
             case WM_DPICHANGED:
             {
                 const auto dpiX = static_cast<float>(LOWORD(wParam));
                 const auto dpiY = static_cast<float>(HIWORD(wParam));
-                window->renderer.updateDpi(dpiX, dpiY);
+                window.dpiScale = dpiX / USER_DEFAULT_SCREEN_DPI;
+                window.renderer.updateDpi(dpiX, dpiY);
 
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
                 const auto* rect = reinterpret_cast<RECT*>(lParam);
@@ -160,10 +184,22 @@ namespace gauzy
                 break;
             }
             default:
+            {
                 break;
+            }
         }
 
-        return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        event::WindowMessageEventContext e{ { {}, window }, uMsg, wParam, lParam };
+        window.onMessageDispatching.trigger(e);
+
+        std::optional<LRESULT> result;
+        if(!e.isCanceled())
+        { 
+            result = window.messageDispatcher.dispatch(uMsg, wParam, lParam);
+        }
+
+        window.onMessageDispatched.trigger(e);
+        return result.value_or(DefWindowProc(hWnd, uMsg, wParam, lParam));
     }
 
     void Window::release()
@@ -171,4 +207,4 @@ namespace gauzy
         renderer.release();
     }
 
-} // namespace gauzy::comp
+} // namespace gauzy

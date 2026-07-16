@@ -1,5 +1,7 @@
 ﻿#include "type/BasicTypes.hpp"
 
+#include <windowsx.h>
+
 namespace gauzy::type
 {
     Position2F::Position2F(const D2D1_POINT_2F& d2dPoint) noexcept :
@@ -22,6 +24,11 @@ namespace gauzy::type
     Position2F::operator Position2U() const
     {
         return Position2U{ x(), y() };
+    }
+
+    Position2F::Position2F(const LPARAM lParam) noexcept :
+        Eigen::Vector2f{ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) }
+    {
     }
 
 
